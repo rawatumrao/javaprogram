@@ -1,4 +1,3 @@
-// src/BitmovinPlayer.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import { Player } from 'bitmovin-player';
 
@@ -8,39 +7,51 @@ const BitmovinPlayer = () => {
   const [player, setPlayer] = useState(null);
 
   useEffect(() => {
-    // Initialize the player only once when the component mounts
-    if (!player && videoUrl) {
+    // Initialize the player when the video URL is available
+    if (videoUrl && !player) {
       const newPlayer = new Player(playerRef.current, {
         key: 'YOUR_BITMOVIN_PLAYER_LICENSE_KEY', // Replace with your Bitmovin license key
         source: {
-          dash: videoUrl, // You can use other formats like HLS, MP4, etc.
+          mp4: videoUrl, // Set the mp4 URL as the source
         },
       });
+
+      // Ensure that the player is loaded before calling play
+      newPlayer.on('ready', () => {
+        newPlayer.load().then(() => {
+          newPlayer.play(); // Start playing the video once loaded
+        }).catch((error) => {
+          console.error('Error loading video:', error);
+        });
+      });
+
       setPlayer(newPlayer);
     }
 
+    // Cleanup player when component unmounts or videoUrl changes
     return () => {
-      // Clean up the player instance when the component unmounts
       if (player) {
         player.destroy();
+        setPlayer(null);
       }
     };
-  }, [videoUrl, player]);
+  }, [videoUrl, player]); // Trigger effect on videoUrl change
 
   const handleVideoChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      // Create a URL for the selected file and set it as the video source
       const videoUrl = URL.createObjectURL(selectedFile);
-      setVideoUrl(videoUrl);
+      setVideoUrl(videoUrl); // Set the videoUrl state to trigger player update
     }
   };
 
   return (
     <div>
-      <h1>Bitmovin Player</h1>
+      <h1>Bitmovin Player - MP4</h1>
       <input
         type="file"
-        accept="video/*"
+        accept="video/mp4" // Ensure only MP4 files are accepted
         onChange={handleVideoChange}
       />
       <div
