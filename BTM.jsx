@@ -7,8 +7,8 @@ const BitmovinPlayer = () => {
   const [player, setPlayer] = useState(null);
 
   useEffect(() => {
-    // Initialize the player when the video URL is available
     if (videoUrl && !player) {
+      // Initialize the player when the video URL is available
       const newPlayer = new Player(playerRef.current, {
         key: 'YOUR_BITMOVIN_PLAYER_LICENSE_KEY', // Replace with your Bitmovin license key
         source: {
@@ -16,12 +16,17 @@ const BitmovinPlayer = () => {
         },
       });
 
-      // Ensure that the player is loaded before calling play
+      // Ensure the player is properly loaded
       newPlayer.on('ready', () => {
+        console.log("Player is ready.");
         newPlayer.load().then(() => {
-          newPlayer.play(); // Start playing the video once loaded
+          newPlayer.play().then(() => {
+            console.log("Video is playing");
+          }).catch((error) => {
+            console.error("Error trying to play the video:", error);
+          });
         }).catch((error) => {
-          console.error('Error loading video:', error);
+          console.error("Error loading video:", error);
         });
       });
 
