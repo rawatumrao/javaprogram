@@ -46,3 +46,25 @@ print(likelihood_results['incident_type'])
 for col, df in likelihood_results.items():
     print(f"\n--- {col} ---")
     print(df)
+
+
+
+# Step 1: Select numerical columns
+numerical_cols = X_train.select_dtypes(include=['int64', 'float64']).columns.tolist()
+
+# Step 2: Combine features and target for plotting
+df_plot = X_train.copy()
+df_plot['fraud_reported'] = y_train
+
+# Step 3: Plot
+plt.figure(figsize=(20, 5 * len(numerical_cols) // 3))
+for i, col in enumerate(numerical_cols, 1):
+    plt.subplot((len(numerical_cols) + 2) // 3, 3, i)
+    sns.boxplot(data=df_plot, x='fraud_reported', y=col, palette='Set2')
+    plt.title(f'{col} vs fraud_reported')
+    plt.xlabel('Fraud Reported')
+    plt.ylabel(col)
+    plt.tight_layout()
+
+plt.suptitle("Bivariate Analysis: Numerical Features vs Target (Box Plots)", fontsize=20, y=1.02)
+plt.show()
