@@ -68,3 +68,29 @@ for i, col in enumerate(numerical_cols, 1):
 
 plt.suptitle("Bivariate Analysis: Numerical Features vs Target (Box Plots)", fontsize=20, y=1.02)
 plt.show()
+
+
+
+def create_features(df):
+    df = df.copy()
+
+    # Ratio features
+    df['claim_to_vehicle_ratio'] = df['total_claim_amount'] / (df['vehicle_claim'] + 1)  # +1 to avoid division by zero
+    df['claim_intensity'] = df['total_claim_amount'] / (df['months_as_customer'] + 1)
+
+    # Binary feature
+    df['is_high_deductible'] = (df['policy_deductable'] > 1000).astype(int)
+
+    # Age groups
+    df['age_group'] = pd.cut(df['age'],
+                             bins=[0, 25, 45, 65, 100],
+                             labels=['young', 'adult', 'senior', 'elder'])
+
+    return df
+
+# Apply to both sets
+X_train_fe = create_features(X_train)
+X_test_fe = create_features(X_test)
+
+# Optional: check new columns
+print("New features added:", set(X_train_fe.columns) - set(X_train.columns))
